@@ -1,0 +1,36 @@
+{
+  "name": "Instagrana",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "William Cabral",
+  "scripts": {
+    "dev": "ts-node-dev --files src/server.ts node_modules --transpileOnly --ignore-watch",
+    "knex:migrate": "knex migrate:latest --knexfile knexfile.ts",
+    "knex:seed": "knex seed:run --knexfile knexfile.ts",
+    "knex:rollback": "knex migrate:rollback"
+  },
+  "dependencies": {
+    "@types/multer": "^1.4.6",
+    "celebrate": "^14.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.95.6",
+    "multer": "^1.4.2",
+    "sqlite3": "^5.0.2",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.10",
+    "@types/express": "^4.17.12",
+    "@types/hapi__joi": "^17.1.6",
+    "@types/jsonwebtoken": "^8.5.2",
+    "@types/knex": "^0.16.1",
+    "@typescript-eslint/eslint-plugin": "^4.26.1",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "ts-node": "^10.0.0"
+  }
+}
