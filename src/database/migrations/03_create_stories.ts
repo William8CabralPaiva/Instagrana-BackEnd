@@ -14,8 +14,7 @@ export async function up(knex: Knex) {
             .onDelete('CASCADE')
             .onUpdate('NO ACTION');
 
-        table.timestamp('data')
-            .defaultTo(knex.fn.now())
+        table.timestamp('expira')
             .notNullable();
 
     });

@@ -1,5 +1,6 @@
 import knex from '../database/connection';
 import { json, Request, Response } from 'express';
+import { dataAmanhaFormatada } from '../helper/utils';
 
 //nao testei stories
 class StoryController {
@@ -7,9 +8,11 @@ class StoryController {
         const { usuarioId } = request;
         const file = request.file?.filename;
 
+        var dataAmanha = dataAmanhaFormatada(new Date())
+
         if (file) {
             const trx = await knex.transaction();
-            const result = await trx("stories").insert({ media: file, perfil_id: usuarioId })
+            const result = await trx("stories").insert({ media: file, perfil_id: usuarioId, expira: dataAmanha })
             await trx.commit();
             return response.status(200).json({ message: "cadastrado com Sucesso" });
         }
