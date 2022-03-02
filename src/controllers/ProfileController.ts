@@ -93,12 +93,32 @@ class ProfileController {
     async seguidores(request: Request, response: Response) {
         const { usuarioId } = request;
 
-        const result = await knex("seguidores")
+        const result: Seguidor[] = await knex("seguidores")
             .select("usuario", "nome", "descricao", "email", "telefone", "avatar", "verificado", "visivel")
             .join("perfil", "seguidores.seguidor_id", "=", "perfil.id")
             .where("perfil_id", usuarioId);
 
-        return response.status(200).json(result);
+
+        var a: Seguidor[] = result;
+
+        a.forEach(element => {
+
+            if (element.visivel) {
+                element.visivel = true
+            } else {
+                element.visivel = false
+            }
+
+            if (element.verificado) {
+                element.verificado = true
+            } else {
+                element.verificado = false
+            }
+        });
+
+
+
+        return response.status(200).json(a);
     }
 
     async removeSeguidor(request: Request, response: Response) {

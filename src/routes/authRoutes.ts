@@ -11,7 +11,8 @@ const authController = new AuthController();
 const routes = express.Router();
 const upload = multer(multerConfig);
 
-routes.get('/login', authController.login);
+routes.post('/login', authController.login);
+routes.get('/random', authController.random);
 //! primeiro colocar o multer dps o validator
 routes.post('/cadastrar', upload.single("image"), cadastroValidator, authController.cadastrar);
 

@@ -5,6 +5,10 @@ import { TipoArquivo } from '../helper/types';
 
 class AuthController {
 
+    async random(request: Request, response: Response) {
+        return response.status(200).json({ message: 'TESTE 2' });
+    }
+
     async login(request: Request, response: Response) {
         const { usuario, senha } = request.body;
 
