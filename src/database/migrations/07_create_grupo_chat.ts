@@ -5,12 +5,12 @@ const tabela = "grupo_chat";
 export async function up(knex: Knex) {
     return knex.schema.createTable(tabela, table => {
         table.integer("id").notNullable();
-        table.integer("perfil_id").unsigned();
+        table.integer("profile_id").unsigned();
         table.boolean("tipo").defaultTo(false);
 
-        table.foreign('perfil_id')
+        table.foreign('profile_id')
             .references('id')
-            .inTable('perfil')
+            .inTable('profile')
             .onDelete('CASCADE')
             .onUpdate('NO ACTION');
     });

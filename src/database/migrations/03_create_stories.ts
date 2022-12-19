@@ -6,11 +6,11 @@ export async function up(knex: Knex) {
     return knex.schema.createTable(tabela, table => {
         table.increments('id').primary();
         table.string('media').notNullable();
-        table.integer('perfil_id').unsigned();
+        table.integer('profile_id').unsigned();
 
-        table.foreign('perfil_id')
+        table.foreign('profile_id')
             .references('id')
-            .inTable('perfil')
+            .inTable('profile')
             .onDelete('CASCADE')
             .onUpdate('NO ACTION');
 

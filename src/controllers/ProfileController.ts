@@ -1,118 +1,118 @@
 import { Request, Response } from 'express';
 import knex from '../database/connection';
 import Jwt from 'jsonwebtoken';
-import { Seguidor } from '../helper/types';
+import { follower } from '../helper/types';
 
 class ProfileController {
-    async addSeguidor(request: Request, response: Response) {
-        const { seguidor } = request.params;
-        const { usuarioId } = request;
+    async addFollower(request: Request, response: Response) {
+        const { follower } = request.params;
+        const { userId } = request;
 
-        const _seguidor = await knex('perfil').select("id").where('usuario', String(seguidor)).first();
+        const _follower = await knex('profile').select("id").where('user', String(follower)).first();
 
-        if (usuarioId == null || _seguidor == null) {
+        if (userId == null || _follower == null) {
             return response.status(400).json({ error: "Não foi possível localizar o usuário" })
         }
 
-        const verificaSeguidor = await knex("seguidores").where("perfil_id", usuarioId).where("seguidor_id", _seguidor.id);
+        const verificafollower = await knex("followers").where("profile_id", userId).where("follower_id", _follower.id);
 
-        if (verificaSeguidor.length > 0) {
+        if (verificafollower.length > 0) {
             return response.json({ error: "Você ja esta seguindo esse usuário" });
         }
 
         const data = {
-            perfil_id: usuarioId,
-            seguidor_id: _seguidor.id
+            profile_id: userId,
+            follower_id: _follower.id
         }
 
         const trx = await knex.transaction();
-        await trx('seguidores').insert(data);
+        await trx('followers').insert(data);
 
         await trx.commit();
 
         return response.status(200).json({ message: "Adicionado com Sucesso" });
     }
 
-    //! mostrar perfil nao esta funcionando arrumar
-    //* verificar se é visivel se sim, mostrar, se nao verifica se esta sendo seguido se sim mostra o perfil do usuario se não exibir msg
-    async mostraPerfil(request: Request, response: Response) {
+    //! mostrar profile nao esta funcionando arrumar
+    //* verificar se é visible se sim, mostrar, se nao verifica se esta sendo seguido se sim mostra o profile do user se não exibir msg
+    async showProfile(request: Request, response: Response) {
         const { id } = request.params;
-        const { usuarioId } = request;
+        const { userId } = request;
 
-        const _seguidor: Seguidor = await knex('perfil').where('id', id).first();
+        const _follower: follower = await knex('profile').where('id', id).first();
 
-        if (usuarioId == null || _seguidor == null) {
+        if (userId == null || _follower == null) {
             return response.status(400).json({ error: "Não foi possível localizar o usuário" })
         }
 
-        const verificaSeguidor = await knex("seguidores").where("perfil_id", usuarioId).where("seguidor_id", _seguidor.id);
+        const verificafollower = await knex("followers").where("profile_id", userId).where("follower_id", _follower.id);
 
-        if (!verificaSeguidor && !_seguidor.visivel as Boolean) {
-            return response.status(200).json({ error: "O perfil deste usuário não esta visível ao publico" });
+        if (!verificafollower && !_follower.visible as Boolean) {
+            return response.status(200).json({ error: "O profile deste usuário não esta visível ao publico" });
         }
-        const perfil: Seguidor = await knex("perfil").where("id", id).first();
-        const qtd_seguindo = await knex("seguidores").select(knex.raw("sum(perfil_id) as quantidade")).where("perfil_id", usuarioId).first();
-        const qtd_seguidores = await knex("seguidores").select(knex.raw("sum(seguidor_id) as quantidade")).where("seguidor_id", id).first();
+        const profile: follower = await knex("profile").where("id", id).first();
+        const qtd_seguindo = await knex("followers").select(knex.raw("sum(profile_id) as quantidade")).where("profile_id", userId).first();
+        const qtd_followers = await knex("followers").select(knex.raw("sum(follower_id) as quantidade")).where("follower_id", id).first();
 
         return response.status(200).json({
-            perfil: perfil,
-            qtd_seguidores: qtd_seguidores.quantidade ? qtd_seguidores.quantidade : 0,
+            profile: profile,
+            qtd_followers: qtd_followers.quantidade ? qtd_followers.quantidade : 0,
             qtd_seguindo: qtd_seguindo.quantidade ? qtd_seguindo.quantidade : 0
         });
     }
 
-    async listaPerfil(request: Request, response: Response) {
-        const { seguidor } = request.params;
-        const { usuarioId } = request;
+    async profileList(request: Request, response: Response) {
+        const { follower } = request.params;
+        const { userId } = request;
 
-        const _seguidor = await knex('perfil').select("id").where('id', String(seguidor)).first();
+        const _follower = await knex('profile').select("id").where('id', String(follower)).first();
 
-        if (usuarioId == null || _seguidor == null) {
+        if (userId == null || _follower == null) {
             return response.status(400).json({ error: "Não foi possível localizar o usuário" })
         }
 
-        const verificaSeguidor = await knex("seguidores").where("perfil_id", usuarioId).where("seguidor_id", _seguidor.id);
+        const verificafollower = await knex("followers").where("profile_id", userId).where("follower_id", _follower.id);
 
-        if (verificaSeguidor.length > 0) {
+        if (verificafollower.length > 0) {
             return response.json({ error: "Você ja esta seguindo esse usuário" });
         }
 
         const data = {
-            perfil_id: usuarioId,
-            seguidor_id: _seguidor.id
+            profile_id: userId,
+            follower_id: _follower.id
         }
 
         const trx = await knex.transaction();
-        await trx('seguidores').insert(data);
+        await trx('followers').insert(data);
 
         await trx.commit();
 
         return response.status(200).json({ message: "Adicionado com Sucesso" });
     }
 
-    async seguidores(request: Request, response: Response) {
-        const { usuarioId } = request;
+    async followers(request: Request, response: Response) {
+        const { userId } = request;
 
-        const result: Seguidor[] = await knex("seguidores")
-            .select("usuario", "nome", "descricao", "email", "telefone", "avatar", "verificado", "visivel")
-            .join("perfil", "seguidores.seguidor_id", "=", "perfil.id")
-            .where("perfil_id", usuarioId);
+        const result: follower[] = await knex("followers")
+            .select("user", "name", "description", "email", "phone", "avatar", "verify", "visible")
+            .join("profile", "followers.follower_id", "=", "profile.id")
+            .where("profile_id", userId);
 
 
-        var a: Seguidor[] = result;
+        var a: follower[] = result;
 
         a.forEach(element => {
 
-            if (element.visivel) {
-                element.visivel = true
+            if (element.visible) {
+                element.visible = true
             } else {
-                element.visivel = false
+                element.visible = false
             }
 
-            if (element.verificado) {
-                element.verificado = true
+            if (element.verify) {
+                element.verify = true
             } else {
-                element.verificado = false
+                element.verify = false
             }
         });
 
@@ -121,17 +121,17 @@ class ProfileController {
         return response.status(200).json(a);
     }
 
-    async removeSeguidor(request: Request, response: Response) {
-        const { seguidor } = request.params;
-        const { usuarioId } = request;
+    async removeFollowers(request: Request, response: Response) {
+        const { follower } = request.params;
+        const { userId } = request;
 
-        const _seguidor = await knex('perfil').select("id").where('usuario', String(seguidor)).first();
+        const _follower = await knex('profile').select("id").where('user', String(follower)).first();
 
-        if (_seguidor == null) {
+        if (_follower == null) {
             return response.status(400).json({ error: "Não foi possível localizar o usuário" })
         }
 
-        const result = await knex("seguidores").where("perfil_id", usuarioId).where("seguidor_id", _seguidor.id)
+        const result = await knex("followers").where("profile_id", userId).where("follower_id", _follower.id)
         if (!result) {
             return response.status(401).json({ error: "Erro ao deletar" });
         }

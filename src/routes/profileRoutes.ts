@@ -9,9 +9,9 @@ const routes = express.Router();
 const profileController = new ProfileController();
 
 routes.use(AuthMiddleware)
-routes.get("/seguidor", profileController.seguidores);
-routes.get("/seguidor/:id", profileController.mostraPerfil);
-routes.post("/seguidor/:seguidor", profileController.addSeguidor);
-routes.delete("/seguidor/:seguidor", profileController.removeSeguidor);
+routes.get("/follower", profileController.followers);
+routes.get("/follower/:id", profileController.showProfile);
+routes.post("/follower/:follower", profileController.addFollower);
+routes.delete("/follower/:follower", profileController.removeFollowers);
 
 export default routes;

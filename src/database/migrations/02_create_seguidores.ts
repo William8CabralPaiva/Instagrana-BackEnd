@@ -1,22 +1,22 @@
 import { Knex } from 'knex';
 
-const tabela = "seguidores";
+const tabela = "followers";
 
 export async function up(knex: Knex) {
     return knex.schema.createTable(tabela, table => {
         table.increments('id').primary();
-        table.integer('perfil_id').unsigned();
-        table.integer('seguidor_id').unsigned();
+        table.integer('profile_id').unsigned();
+        table.integer('follower_id').unsigned();
 
-        table.foreign('perfil_id')
+        table.foreign('profile_id')
             .references('id')
-            .inTable('perfil')
+            .inTable('profile')
             .onDelete('CASCADE')
             .onUpdate('NO ACTION');
 
-        table.foreign('seguidor_id')
+        table.foreign('follower_id')
             .references('id')
-            .inTable('perfil')
+            .inTable('profile')
             .onDelete('CASCADE')
             .onUpdate('NO ACTION');
     });

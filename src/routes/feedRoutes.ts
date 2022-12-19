@@ -11,11 +11,11 @@ const upload = multer(multerConfig);
 const feedController = new FeedController();
 
 routes.use(AuthMiddleware)
-routes.get("/feed", feedController.feedPessoal);
-routes.get("/feed/geral", feedController.feedSeguidores);
+routes.get("/feed", feedController.myFeed);
+routes.get("/feed/general", feedController.feedFollowers);
 routes.post("/feed", upload.array("image"), feedController.addFeed);//validar;
 
-//salvar nome do arquivo no banco só o nome
+//salvar name do arquivo no banco só o name
 //url pode mudar
 //tentar salvar varias
 //colocar imagem name

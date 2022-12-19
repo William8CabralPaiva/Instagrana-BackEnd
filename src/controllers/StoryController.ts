@@ -5,14 +5,14 @@ import { dataAmanhaFormatada } from '../helper/utils';
 //nao testei stories
 class StoryController {
     async addStory(request: Request, response: Response) {
-        const { usuarioId } = request;
+        const { userId } = request;
         const file = request.file?.filename;
 
         var dataAmanha = dataAmanhaFormatada(new Date())
 
         if (file) {
             const trx = await knex.transaction();
-            const result = await trx("stories").insert({ media: file, perfil_id: usuarioId, expira: dataAmanha })
+            const result = await trx("stories").insert({ media: file, profile_id: userId, expira: dataAmanha })
             await trx.commit();
             return response.status(200).json({ message: "cadastrado com Sucesso" });
         }
@@ -22,8 +22,8 @@ class StoryController {
 
     }
     async showMyStory(request: Request, response: Response) {
-        const { usuarioId } = request;
-        const select = await knex("stories").where("perfil_id", usuarioId).where("data");
+        const { userId } = request;
+        const select = await knex("stories").where("profile_id", userId).where("data");
         return response.status(200).json({ message: "cadastrado com Sucesso" });
 
 
@@ -33,12 +33,12 @@ class StoryController {
     }
 
     async showStory(request: Request, response: Response) {
-        const { usuarioId } = request;
+        const { userId } = request;
         const file = request.file?.filename;
         const trx = await knex.transaction();
 
         if (!file) {
-            const result = await trx("stories").insert({ media: file, perfil_id: usuarioId })
+            const result = await trx("stories").insert({ media: file, profile_id: userId })
             return response.status(200).json({ message: "cadastrado com Sucesso" });
 
         }

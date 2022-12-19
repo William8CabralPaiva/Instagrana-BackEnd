@@ -3,8 +3,8 @@ import { celebrate, Segments, Joi } from 'celebrate';
 export const loginValidator = celebrate(
     {
         [Segments.BODY]: Joi.object().keys({
-            usuario: Joi.string().required(),
-            senha: Joi.string().required(),
+            user: Joi.string().required(),
+            password: Joi.string().required(),
         }),
     },
     {
@@ -15,12 +15,12 @@ export const loginValidator = celebrate(
 export const cadastroValidator = celebrate(
     {
         [Segments.BODY]: Joi.object().keys({
-            usuario: Joi.string().required(),
-            senha: Joi.string().required(),
-            nome: Joi.string().required(),
-            descricao: Joi.string().required(),
+            user: Joi.string().required(),
+            password: Joi.string().required(),
+            name: Joi.string().required(),
+            description: Joi.string().required(),
             email: Joi.string().required().email(),
-            telefone: Joi.string().required().max(11),
+            phone: Joi.string().required().max(11),
             avatar: Joi.string()
         }),
     },

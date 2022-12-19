@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import knex from '../database/connection';
+import { ResponseError } from '../helper/types'
 
 interface Payload {
     id: number,
-    usuario: String,
-    senha: String
+    user: String,
+    password: String
 }
 
 async function AuthMiddleware(request: Request, response: Response, next: NextFunction) {
@@ -19,20 +20,24 @@ async function AuthMiddleware(request: Request, response: Response, next: NextFu
 
     try {
         const data = jwt.verify(token, "8bc74bd610621039470ca499796e7599") as Payload
-        const { id, usuario, senha } = data
+        const { id, user, password } = data
 
-        const result = await knex('perfil').where('usuario', usuario).where('senha', senha).first();
+        const result = await knex('profile').where('user', user).where('password', password).first();
 
         if (result) {
-            request.usuarioId = id;
-            request.usuario = usuario;
-            request.usuarioSenha = senha;
+            request.userId = id;
+            request.user = user;
+            request.userpassword = password;
             return next();
         }
-        return response.status(401).send({ error: "Senha alterada" });
+        return response.status(401).send({ error: "senha alterada" });
 
     } catch (err) {
-        return response.status(401).send({ error: "Token invalido" });
+        let error: ResponseError = {
+            code: 423,
+            error: "Token invalido"
+        };
+        return response.status(error.code).send(error);
     }
 }
 

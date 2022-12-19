@@ -2,20 +2,20 @@ import { json, Request, Response } from 'express';
 import knex from '../database/connection';
 import { TipoArquivo } from '../helper/types'
 
-interface SeguidorId {
-    seguidor_id: Number,
+interface followerId {
+    follower_id: Number,
 }
 
 class FeedController {
-    //!cadastrar algo no usuario vinculado para testar
-    async feedPessoal(request: Request, response: Response) {
+    //!cadastrar algo no user vinculado para testar
+    async myFeed(request: Request, response: Response) {
         //var { page } = request.body;
-        const { usuarioId } = request;
+        const { userId } = request;
 
         const result = await knex("feed")
             .leftJoin("feed_image", "feed.id", "=", "feed_image.feed_id")
-            .leftJoin("feed_comentarios", "feed.id", "=", "feed_comentarios.feed_id")
-            .where("feed.perfil_id", usuarioId)
+            .leftJoin("feed_comments", "feed.id", "=", "feed_comments.feed_id")
+            .where("feed.profile_id", userId)
             .orderBy("data", "desc")
 
 
@@ -26,23 +26,23 @@ class FeedController {
         //TODO PAGINAR devolvendo o max de paginas
         return response.status(200).json(result);
     }
-    async feedSeguidores(request: Request, response: Response) {
-        const { usuarioId } = request;
+    async feedFollowers(request: Request, response: Response) {
+        const { userId } = request;
 
 
-        const result_seguidores: Array<SeguidorId> = await knex("seguidores").select("seguidor_id").where("perfil_id", usuarioId);
-        var seguidores: Array<Number> = Array<Number>();
-        result_seguidores.forEach((seguidor: SeguidorId) => {
-            seguidores.push(seguidor.seguidor_id);
+        const result_followers: Array<followerId> = await knex("followers").select("follower_id").where("profile_id", userId);
+        var followers: Array<Number> = Array<Number>();
+        result_followers.forEach((follower: followerId) => {
+            followers.push(follower.follower_id);
         });
-        //!cadastrar algo no usuario vinculado para testar
+        //!cadastrar algo no user vinculado para testar
         const result = await knex("feed")
-            .join("perfil", "feed.perfil_id", "=", "perfil.id")
+            .join("profile", "feed.profile_id", "=", "profile.id")
             .leftJoin("feed_image", "feed.id", "=", "feed_image.feed_id")
-            .leftJoin("feed_comentarios", "feed.id", "=", "feed_comentarios.feed_id")
-            .where("perfil_id", usuarioId)
-            .where("feed.perfil_id", usuarioId)
-            .whereIn("perfil.id", seguidores)
+            .leftJoin("feed_comments", "feed.id", "=", "feed_comments.feed_id")
+            .where("profile_id", userId)
+            .where("feed.profile_id", userId)
+            .whereIn("profile.id", followers)
             .orderBy("data", "desc")
 
         if (!result) {
@@ -52,12 +52,12 @@ class FeedController {
         return response.status(200).json(result);
     }
     async addFeed(request: Request, response: Response) {
-        const { usuarioId } = request;
-        const { descricao } = request.body;
+        const { userId } = request;
+        const { description } = request.body;
         const files = request.files as Array<TipoArquivo>
         const feed = {
-            descricao,
-            perfil_id: usuarioId
+            description,
+            profile_id: userId
         }
 
         //.limit(0, 10);
@@ -67,7 +67,7 @@ class FeedController {
 
             if (result_feed[0]) {
                 files.forEach(async _file => {
-                    await trx("feed_image").insert({ feed_id: usuarioId, nome: _file.fieldname, media: _file.fieldname })
+                    await trx("feed_image").insert({ feed_id: userId, name: _file.fieldname, media: _file.fieldname })
                 });
                 await trx.commit();
                 return response.status(200).json({ message: "feed cadastrado com sucesso" });
@@ -77,15 +77,15 @@ class FeedController {
         return response.status(401).json({ error: "erro" });
 
     }
-    async addComentario(request: Request, response: Response) {
-        const { id, comentario, curtir } = request.body;
+    async addComments(request: Request, response: Response) {
+        const { id, comment, like } = request.body;
 
         const result = {
             id,
-            comentario,
-            curtir
+            comment,
+            like
         }
-        const select = await knex("feed_comentarios").where("feed_id", id);
+        const select = await knex("feed_comments").where("feed_id", id);
         if (!select) {
             return response.status(404).json({ error: "Nenhuma informação encontrada" });
         }
@@ -103,7 +103,7 @@ class FeedController {
 
     }
     async addFiles(request: Request, response: Response) {
-        const { usuarioId } = request;
+        const { userId } = request;
         const { id } = request.body;
         const files = request.files as Array<TipoArquivo>
 
@@ -118,7 +118,7 @@ class FeedController {
             const trx = await knex.transaction();
 
             files.forEach(async _file => {
-                await trx("feed_image").insert({ feed_id: usuarioId, nome: _file.fieldname, media: _file.fieldname })
+                await trx("feed_image").insert({ feed_id: userId, name: _file.fieldname, media: _file.fieldname })
             });
             await trx.commit();
             return response.status(200).json({ message: "feed cadastrado com sucesso" });

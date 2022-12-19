@@ -8,15 +8,21 @@ export interface TipoArquivo {
     path: String,
     size: Number
 }
-export interface Seguidor {
+export interface follower {
     id: Number,
-    usuario: String,
-    senha: String,
-    nome: String,
-    descricao: String,
+    user: String,
+    password: String,
+    name: String,
+    description: String,
     email: String,
-    telefone: String,
+    phone: String,
     avatar: String,
-    verificado: Boolean,
-    visivel: Boolean
+    verify: Boolean,
+    visible: Boolean,
+    token: String
+}
+
+export interface ResponseError {
+    code: number,
+    error: String,
 }

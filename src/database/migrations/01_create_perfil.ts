@@ -1,19 +1,19 @@
 import { Knex } from 'knex';
 
-const tabela = "perfil";
+const tabela = "profile";
 
 export async function up(knex: Knex) {
     return knex.schema.createTable(tabela, table => {
         table.increments('id').primary();
-        table.string('usuario').unique();
-        table.string('senha').notNullable();
-        table.string('nome').notNullable();
-        table.string('descricao').notNullable();
+        table.string('user').unique();
+        table.string('password').notNullable();
+        table.string('name').notNullable();
+        table.string('description').notNullable();
         table.string('email').notNullable();
-        table.string('telefone', 11).notNullable();
+        table.string('phone', 11).notNullable();
         table.string('avatar');
-        table.boolean('verificado').notNullable().defaultTo(false);
-        table.boolean('visivel').notNullable().defaultTo(true);
+        table.boolean('verify').notNullable().defaultTo(false);
+        table.boolean('visible').notNullable().defaultTo(true);
     });
 }
 

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import knex from '../database/connection';
 import Jwt from 'jsonwebtoken';
-import { TipoArquivo } from '../helper/types';
+import { follower, TipoArquivo } from '../helper/types';
 
 class AuthController {
 
@@ -10,51 +10,64 @@ class AuthController {
     }
 
     async login(request: Request, response: Response) {
-        const { usuario, senha } = request.body;
+        const { user, password } = request.body;
 
-        const result = await knex('perfil').where('usuario', usuario).where('senha', senha).first();
+        const result = await knex('profile').where('user', user).where('password', password).first();
 
         if (result) {
             const id = result.id
-            const token = Jwt.sign({ id: id, usuario, senha }, "8bc74bd610621039470ca499796e7599", {
+            const token = Jwt.sign({ id: id, user, password }, "8bc74bd610621039470ca499796e7599", {
                 expiresIn: "1w"
             })
-            var json = result;
+            var json: follower = result;
             json.token = token;
+
+            //esse bloco de baixo é pra converter 0 e 1 para boleano
+            if (json.verify) {
+                json.verify = true
+            } else {
+                json.verify = false
+            }
+            if (json.visible) {
+                json.visible = true
+            } else {
+                json.visible = false
+            }
+
             return response.status(200).json(json)
         }
 
         return response.status(400).json({ message: 'Usuário não Encontrado' });
     }
 
-    async cadastrar(request: Request, response: Response) {
+    async register(request: Request, response: Response) {
         const { body } = request;
         const file = request.file
 
         const dados = {
-            usuario: body.usuario,
-            senha: body.senha,
-            nome: body.nome,
-            descricao: body.descricao,
+            user: body.user,
+            password: body.password,
+            name: body.name,
+            description: body.description,
             email: body.email,
-            telefone: body.telefone,
+            phone: body.phone,
             avatar: file != null ? file.fieldname : ""
         };
 
-        const selectUsername = await knex('perfil').where('usuario', body.usuario);
+        const selectUsername = await knex('profile').where('user', body.user);
 
         if (selectUsername.length > 0) {
-            return response.status(400).json({ error: "Usuário já existe, favor trocar o nome de usuário" })
+            return response.status(400).json({ error: "Usuário já existe, favor trocar o name de usuário" })
         }
 
         const trx = await knex.transaction();
-        const result = await trx('perfil').insert(dados);
+        const result = await trx('profile').insert(dados);
 
         await trx.commit();
 
         if (result[0] != 0) {
             //verificar esse id
-            const token = Jwt.sign({ id: result, usuario: body.usuario, senha: body.senha }, "8bc74bd610621039470ca499796e7599", {
+            const token = Jwt.sign({ id: result, user: body.user, password: body.password }, "8bc74bd610621039470ca499796e7599", {
                 expiresIn: "1w"
             })
             var json = {
